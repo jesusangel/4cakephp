@@ -1,5 +1,8 @@
 <?php
 /**
+ *
+ **/
+/**
  * WhoDidIt Model Behavior for CakePHP
  *
  * Handles created_by, modified_by fields for a given Model, if they exist in the Model DB table.
@@ -28,7 +31,11 @@ class WhoDidItBehavior extends ModelBehavior {
     'user_model' => 'User',    //name of User model
 	'created_by_field' => 'created_by',    //the name of the "created_by" field in DB (default 'created_by')
 	'modified_by_field' => 'modified_by',  //the name of the "modified_by" field in DB (default 'modified_by')
-	'auto_bind' => true     //automatically bind the model to the User model (default true)
+	'auto_bind' => true,	//automatically bind the model to the User model (default true)
+  	'auto_bind_models' => array(
+  		'CreatorModel' => 'CreatedBy',
+  		'ModifierModel' => 'ModifiedBy'
+  	)     
   );
 /**
  * Initiate WhoMadeIt Behavior
@@ -57,7 +64,7 @@ class WhoDidItBehavior extends ModelBehavior {
 		{
 		    if ($hasFieldCreatedBy) {
     			$commonBelongsTo = array(
-    				'CreatedBy' => array('className' => $this->settings[$model->alias]['user_model'],
+    				$this->settings[$model->alias]['auto_bind_models']['CreatorModel'] => array('className' => $this->settings[$model->alias]['user_model'],
     									'foreignKey' => $this->settings[$model->alias]['created_by_field'])
     									);
     			$model->bindModel(array('belongsTo' => $commonBelongsTo), false);
@@ -65,7 +72,7 @@ class WhoDidItBehavior extends ModelBehavior {
 
     		if ($hasFieldModifiedBy) {
     			$commonBelongsTo = array(
-    				'ModifiedBy' => array('className' => $this->settings[$model->alias]['user_model'],
+    				$this->settings[$model->alias]['auto_bind_models']['ModifierModel'] => array('className' => $this->settings[$model->alias]['user_model'],
     									'foreignKey' => $this->settings[$model->alias]['modified_by_field']));
     			$model->bindModel(array('belongsTo' => $commonBelongsTo), false);
     		}
